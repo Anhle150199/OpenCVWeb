@@ -17,7 +17,7 @@
         <a class="upload " id="call-to-action" onclick="myFunction()"><span>Select Your Upload</span></a>
         <!-- <br/> -->
         <h5 id="status-file"></h5>
-        <form id="upload" method="post" action="{% url 'post:filter' %}" enctype="multipart/form-data" >
+        <form id="upload" method="post" action="{% url 'post:faceDetect' %}" enctype="multipart/form-data" >
           {% csrf_token %}
           <input id="submit-file" type="file" name="image"  class="upload-hidden" onchange="funChange()">
           <div class="row">

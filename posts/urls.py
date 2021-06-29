@@ -5,5 +5,5 @@ urlpatterns = [
     path('', views.filter, name='filter'),
     path('obj-detect/', views.objDt, name='objDt'),
     path('obj-counting/', views.objCounting, name='counting'),
-
+    path('face-detect/', views.faceDt, name='faceDetect'),
 ]

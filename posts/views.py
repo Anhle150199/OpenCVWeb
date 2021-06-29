@@ -10,7 +10,7 @@ from .models import CV
 
 
 from django.core.files.storage import default_storage
-from .CVFun import cannyFilter, objDetect
+from .CVFun import cannyFilter, objDetect, faceDetect
 from .ObjectCounting import counting
 from django.conf import settings
 import numpy as np
@@ -105,19 +105,50 @@ def objCounting(request):
             step1 = os.path.join(settings.MEDIA_ROOT / 'images', 'step1.jpg')
             step2 = os.path.join(settings.MEDIA_ROOT / 'images', 'step2.jpg')
             step3 = os.path.join(settings.MEDIA_ROOT / 'images', 'step3.jpg')
-            step4 = os.path.join(settings.MEDIA_ROOT / 'images', 'step4.jpg')
-            step5 = os.path.join(settings.MEDIA_ROOT / 'images', 'step5.jpg')
+            # step4 = os.path.join(settings.MEDIA_ROOT / 'images', 'step4.jpg')
+            # step5 = os.path.join(settings.MEDIA_ROOT / 'images', 'step5.jpg')
 
             cv2.imwrite(outUrl, count[0])
-            cv2.imwrite(step1, count[2])
-            cv2.imwrite(step2, count[3])
-            cv2.imwrite(step3, count[4])
-            cv2.imwrite(step4, count[5])
-            cv2.imwrite(step5, count[6])
+            cv2.imwrite(step1, count[1])
+            cv2.imwrite(step2, count[2])
+            cv2.imwrite(step3, count[3])
+            # cv2.imwrite(step4, count[5])
+            # cv2.imwrite(step5, count[6])
             data = True
-            return render(request, 'objectCounting.html', {'data': data,"count": count[1]})
+            return render(request, 'objectCounting.html', {'data': data,"count": count[4], "choice": choice})
 
     return render(request, 'objectCounting.html')
+
+
+def faceDt(request):
+    form = CVForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        obj = request.FILES['image']
+
+        img = readImage(obj)
+
+        face = faceDetect(img)
+        # face = readImage(face)
+
+        # face = img
+        # face = cannyFilter(img)
+        outUrl = os.path.join(settings.MEDIA_ROOT / 'images', 'ouput.jpg')
+        cv2.imwrite(outUrl, face)
+        if path.exists(settings.MEDIA_ROOT / 'images/input.jpg'):
+            os.remove(settings.MEDIA_ROOT / 'images/input.jpg')
+        obj.name = 'input.jpg'
+        inImg = CV(image=obj)
+        inImg.save()
+        out = CV(imageResult=outUrl)
+
+        inUrl = inImg.image.url
+        outUrl = out.imageResult.url
+        data = True
+        return render(request, 'faceDetect.html', {'data': data, 'inUrl': inUrl, 'outUrl': outUrl})
+    else:
+        form = CVForm()
+
+    return render(request, 'faceDetect.html', )
 
 
 def upload(f, nameFile):
